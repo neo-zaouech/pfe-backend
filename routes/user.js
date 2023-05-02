@@ -1,35 +1,34 @@
-const express = require("express");
-const User = require("../models/user");
-const router = express.Router();
+const express = require('express')
+const User = require('../models/user')
+const router = express.Router()
 
-router.post("/", async (req, res) => {
+router.post('/', async (req, res) => {
   try {
-    const { nom, prenom, cin, motPasse, email, role, bureau } = req.body;
-    const user = new User({ nom, prenom, cin, motPasse, email, role, bureau });
-    const result = await user.save();
-    res.send(result);
+    const { nom, prenom, cin, motPasse, email, role, bureau } = req.body
+    const user = new User({ nom, prenom, cin, motPasse, email, role, bureau })
+    const result = await user.save()
+    res.send(result)
   } catch (error) {
-    res.send(error);
+    res.send(error)
   }
-});
+})
 
-router.post("/login", async (req, res) => {
+router.post('/login', async (req, res) => {
   try {
-    const { cin, motPasse } = req.body;
-    const user = await User.findOne({ cin });
-
+    const { cin, motPasse } = req.body
+    const user = await User.findOne({ cin })
     if (user === null) {
-      res.send("cin incorrecte");
+      res.send('cin incorrecte')
     } else {
       if (user.motPasse === motPasse) {
-        res.send(user);
+        res.send(user)
       } else {
-        res.send("mot de passe incorrecte");
+        res.send('mot de passe incorrecte')
       }
     }
   } catch (error) {
-    res.send(error);
+    res.send(error)
   }
-});
+})
 
-module.exports = router;
+module.exports = router

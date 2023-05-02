@@ -1,7 +1,14 @@
 const express = require('express')
 const Bureau = require('../models/bureau')
 const Service = require('../models/service')
+const User = require('../models/user')
 const router = express.Router()
+
+//get Bureaux
+router.get('/bureau', async (req, res) => {
+  const bureaux = await Bureau.find({ ...req.query })
+  res.send(bureaux)
+})
 //ajout Bureau
 router.post('/bureau', async (req, res) => {
   try {
@@ -34,8 +41,9 @@ router.delete('/bureau', async (req, res) => {
   try {
     const { idBureau } = req.body
     const bureau = await Bureau.findById(idBureau)
-    bureau.deletedAt = new Date()
-    const result = await bureau.save()
+    bureau.deletedAt = bureau.deletedAt ? null : new Date()
+    await bureau.save()
+    const result = await Bureau.find()
     res.send(result)
   } catch (error) {
     res.status(400).send({ error: error.message })
@@ -75,12 +83,19 @@ router.delete('/service', async (req, res) => {
   try {
     const { idService } = req.body
     const service = await Service.findById(idService)
-    service.deletedAt = new Date()
-    const result = await service.save()
+    service.deletedAt = service.deletedAt ? null : new Date()
+    await service.save()
+    const result = await Service.find()
     res.send(result)
   } catch (error) {
     res.status(400).send({ error: error.message })
   }
+})
+
+//get Users
+router.get('/user', async (req, res) => {
+  const users = await User.find({ ...req.query })
+  res.send(users)
 })
 
 module.exports = router
