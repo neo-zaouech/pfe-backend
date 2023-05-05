@@ -13,6 +13,8 @@ const userSchema = new Schema({
     required: true,
   },
   bureau: { type: Object, default: null },
+  createdAt: { type: Date, default: Date.now },
+  deletedAt: { type: Date, default: null },
 })
 
 const User = mongoose.model('users', userSchema)
