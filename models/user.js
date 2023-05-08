@@ -12,11 +12,11 @@ const userSchema = new Schema({
     enum: ['chef_service', 'guichier', 'admin'],
     required: true,
   },
-  bureau: { type: Object, default: null },
+  bureau: { type: Schema.Types.ObjectId, ref: 'office' },
   createdAt: { type: Date, default: Date.now },
   deletedAt: { type: Date, default: null },
 })
 
-const User = mongoose.model('users', userSchema)
+const User = mongoose.model('user', userSchema)
 User.createIndexes()
 module.exports = User
