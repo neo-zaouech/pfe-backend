@@ -6,38 +6,51 @@ const router = express.Router()
 
 //get Bureaux
 router.get('/bureau', async (req, res) => {
-  const bureaux = await Bureau.find({ ...req.query }).populate(
-    'listeServices.service'
-  )
+  const bureaux = await Bureau.find({ ...req.query })
+    .populate('listeEmploye.chefService')
+    .populate('listeServices')
   res.send(bureaux.reverse())
 })
 //ajout Bureau
 router.post('/bureau', async (req, res) => {
   try {
-    const { localisation, horaire } = req.body
+    const { localisation, horaire, listeServices, chefService } = req.body
     const bureau = new Bureau({ localisation, horaire })
+    bureau.listeServices = listeServices
+    bureau.listeEmploye = {
+      chefService: chefService !== null ? chefService._id : null,
+      employe: [],
+    }
     const result = await bureau.save()
+    if (chefService !== null) {
+      const user = await User.findById(chefService._id)
+      user.bureau = bureau._id
+      const x = await user.save()
+    }
     res.send(result)
   } catch (error) {
-    res.status(400).send(error)
+    res.status(400).send(error.message)
   }
 })
 //modifier Bureau
 router.put('/bureau', async (req, res) => {
   try {
     const { bureauReq } = req.body
-    const bureau = await Bureau.findById(bureauReq._id).populate(
-      'listeServices'
-    )
+    const bureau = await Bureau.findById(bureauReq._id)
+      .populate('listeServices')
+      .populate('listeEmploye.chefService')
     bureau.horaire = bureauReq.horaire
     bureau.localisation = bureauReq.localisation
     bureau.listeServices = bureauReq.listeServices.map((service) => {
       return service._id
     })
-    bureau.listeEmploye = bureauReq.listeEmploye
-    bureau.chefService = bureauReq.chefService
+    bureau.listeEmploye.chefService = bureauReq.listeEmploye.chefService
     const result = await bureau.save()
-
+    if (bureauReq.listeEmploye.chefService) {
+      const user = await User.findById(bureauReq.listeEmploye.chefService)
+      user.bureau = bureau._id
+      const x = await user.save()
+    }
     res.send(result)
   } catch (error) {
     res.status(400).send({ error: error.message })
@@ -51,6 +64,9 @@ router.delete('/bureau', async (req, res) => {
     bureau.deletedAt = bureau.deletedAt ? null : new Date()
     await bureau.save()
     const result = await Bureau.find()
+      .populate('listeServices')
+      .populate('listeEmploye.chefService')
+      .populate('listeEmploye.employe')
     res.send(result)
   } catch (error) {
     res.status(400).send({ error: error.message })
@@ -101,7 +117,7 @@ router.delete('/service', async (req, res) => {
 
 //get Users
 router.get('/user', async (req, res) => {
-  const users = await User.find({ ...req.query })
+  const users = await User.find({ ...req.query }).populate('bureau')
   res.send(users.reverse())
 })
 
@@ -119,9 +135,15 @@ router.post('/user', async (req, res) => {
       motPasse,
     })
     const result = await user.save()
-    res.send(result)
+    if (role === 'guichier') {
+      const b = await Bureau.findById(bureau._id)
+
+      b.listeEmploye.employe.push(result._id)
+      const x = await b.save()
+      res.send(x)
+    }
   } catch (error) {
-    res.status(400).send(error)
+    res.status(400).send(error.message)
   }
 })
 
