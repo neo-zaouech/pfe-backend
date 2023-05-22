@@ -1,24 +1,32 @@
-const express = require("express");
-const cors = require("cors");
-const mongoose = require("mongoose");
-const port = 5000;
-const app = express();
-const userRouter = require("./routes/user");
-const adminRouter = require("./routes/admin");
+const express = require('express')
+const cors = require('cors')
+const mongoose = require('mongoose')
+const port = 5000
+const app = express()
+const userRouter = require('./routes/user')
+const adminRouter = require('./routes/admin')
+const chefServiceRouter = require('./routes/chefService')
+const actualiteRouter = require('./routes/actualite')
+const path = require('path')
+
+app.use(express.static(path.join(__dirname, 'public')))
+
 mongoose
-  .connect("mongodb://127.0.0.1:27017/POSTE_TN")
+  .connect('mongodb://127.0.0.1:27017/POSTE_TN')
   .then(() => {
-    console.log("connected to DB");
+    console.log('connected to DB')
   })
   .catch((error) => {
-    console.log(error.message);
-  });
-app.use(express.json());
-app.use(cors());
+    console.log(error.message)
+  })
+app.use(express.json())
+app.use(cors())
 
-app.use("/user", userRouter);
-app.use("/admin", adminRouter);
+app.use('/user', userRouter)
+app.use('/admin', adminRouter)
+app.use('/chef_service', chefServiceRouter)
+app.use('/actualite', actualiteRouter)
 
 app.listen(port, () => {
-  console.log("application running on " + port);
-});
+  console.log('application running on ' + port)
+})
