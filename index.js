@@ -8,6 +8,7 @@ const adminRouter = require('./routes/admin')
 const chefServiceRouter = require('./routes/chefService')
 const actualiteRouter = require('./routes/actualite')
 const reclamationRouter = require('./routes/reclamation')
+const messageRouter = require('./routes/message')
 const path = require('path')
 
 app.use(express.static(path.join(__dirname, 'public')))
@@ -28,6 +29,7 @@ app.use('/admin', adminRouter)
 app.use('/chef_service', chefServiceRouter)
 app.use('/actualite', actualiteRouter)
 app.use('/reclamation', reclamationRouter)
+app.use('/message', messageRouter)
 
 app.listen(port, () => {
   console.log('application running on ' + port)
